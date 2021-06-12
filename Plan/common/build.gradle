@@ -1,22 +1,25 @@
 dependencies {
-    compile "net.playeranalytics:platform-abstraction-layer-api:$palVersion"
-    compile project(":api")
-    compileOnly project(":extensions")
-    compile project(path: ":extensions", configuration: 'shadow')
-    compile "org.apache.commons:commons-text:$commonsTextVersion"
-    compile "org.apache.commons:commons-compress:$commonsCompressVersion"
-    compile "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
-    implementation "com.h2database:h2:$h2Version"
-    implementation "mysql:mysql-connector-java:$mysqlVersion"
-    implementation "org.xerial:sqlite-jdbc:$sqliteVersion"
-    compile "com.zaxxer:HikariCP:$hikariVersion"
-    compile "org.slf4j:slf4j-nop:$slf4jVersion"
-    compile "org.slf4j:slf4j-api:$slf4jVersion"
-    compile "com.maxmind.geoip2:geoip2:$geoIpVersion"
-    compile "com.google.code.gson:gson:$gsonVersion"
+    api "net.playeranalytics:platform-abstraction-layer-api:$palVersion"
+    api project(":api")
+    api project(":extensions")
+    api "org.apache.commons:commons-text:$commonsTextVersion"
+    api "org.apache.commons:commons-compress:$commonsCompressVersion"
+    api "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
+    api "org.slf4j:slf4j-api:$slf4jVersion"
+    api "com.maxmind.geoip2:geoip2:$geoIpVersion"
+    api "com.google.code.gson:gson:$gsonVersion"
+    api "com.zaxxer:HikariCP:$hikariVersion"
 
-    testCompile project(":api")
-    testCompile "com.google.code.gson:gson:$gsonVersion"
+    compileOnly "com.h2database:h2:$h2Version"
+    compileOnly "mysql:mysql-connector-java:$mysqlVersion"
+    compileOnly "org.xerial:sqlite-jdbc:$sqliteVersion"
+
+    runtimeOnly "org.slf4j:slf4j-nop:$slf4jVersion"
+
+    testImplementation project(":api")
+    testImplementation "com.google.code.gson:gson:$gsonVersion"
+    testImplementation "com.h2database:h2:$h2Version"
+    testImplementation "org.xerial:sqlite-jdbc:$sqliteVersion"
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -30,13 +33,13 @@ task updateVersion(type: Copy) {
     filter(ReplaceTokens, tokens: [version: '' + project.ext.fullVersion])
 }
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     dependsOn updateVersion
     from 'build/sources/resources'
 }
 
 shadowJar {
-    dependsOn processResources
-    configurations = [project.configurations.compile]
+    //dependsOn processResources
 
     // Exclude these files
     exclude "**/*.svg"
